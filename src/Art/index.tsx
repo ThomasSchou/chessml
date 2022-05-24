@@ -1,0 +1,13 @@
+export const white_king = require('./white-king.png')
+export const white_queen = require('./white-queen.png')
+export const white_rook = require('./white-rook.png')
+export const white_bishop = require('./white-bishop.png')
+export const white_knight = require('./white-knight.png')
+export const white_pawn = require('./white-pawn.png')
+
+export const black_king = require('./black-king.png')
+export const black_queen = require('./black-queen.png')
+export const black_rook = require('./black-rook.png')
+export const black_bishop = require('./black-bishop.png')
+export const black_knight = require('./black-knight.png')
+export const black_pawn = require('./black-pawn.png')
