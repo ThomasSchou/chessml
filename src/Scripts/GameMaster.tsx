@@ -12,7 +12,8 @@ import { BoardToBitBoard } from "./BoardToBitBoard";
 import { CalculateReward } from "./CalculateReward";
 import { ReverseBitBoard } from "./ReverseBitBoard";
 
-
+let memory = new Memory()
+let model = new Model(5, 3, 1, 5)
 
 let state = store.getState()
 let gameState = state.gameState
@@ -55,9 +56,6 @@ export function startGame () {
       case 1:
 
         console.log("gametype = pvai")
-
-        const model = new Model(5, 3, 1, 5)
-        let memory = new Memory()
 
         store.subscribe(() => {
           state = store.getState()
@@ -112,6 +110,86 @@ export function startGame () {
       case 2:
         console.log("gametype = aivai")
 
+        store.subscribe(() => {
+          state = store.getState()
+          
+          gameState = state.gameState
+
+          if(currentStatus !== gameState.status || currentTurn !== gameState.colorTurn) {
+            currentStatus = gameState.status
+            currentTurn = gameState.colorTurn
+            if(gameState.colorTurn === 0) {
+
+              console.log("ai 1 turn")
+              checkPawn()
+              checkKing()
+              if(gameState.status !== 3) {
+                const legalMoves = calcAIMove(0)
+
+                console.log(legalMoves)
+        
+                const desiredMove = model.PredictBestMove(legalMoves, true)
+                aiMovePiece(desiredMove![0] + 1, desiredMove![1] + 1)
+                
+                //Save state and reward from both sides to memory
+                const bitBoard = BoardToBitBoard()
+                const reversedBitBoard = ReverseBitBoard(bitBoard as [number])
+                
+                memory.addToMemory(bitBoard, CalculateReward(bitBoard))
+                memory.addToMemory(reversedBitBoard, CalculateReward(reversedBitBoard))
+
+
+
+              }
+
+            } else {
+              console.log("ai 2 turn")
+              checkPawn()
+              checkKing()
+
+              if(gameState.status === 4) {
+                
+              }
+              if(gameState.status !== 3) {
+
+                
+                const legalMoves = calcAIMove(1)
+
+                console.log(legalMoves)
+
+                const desiredMove = model.PredictBestMove(legalMoves, false)
+                aiMovePiece(desiredMove![0] + 1, desiredMove![1] + 1)
+                
+                //Save state and reward from both sides to memory
+                const bitBoard = BoardToBitBoard()
+                const reversedBitBoard = ReverseBitBoard(bitBoard as [number])
+                
+                memory.addToMemory(bitBoard, CalculateReward(bitBoard))
+                memory.addToMemory(reversedBitBoard, CalculateReward(reversedBitBoard))
+
+               
+
+              }
+
+            }
+          }
+          
+        })
+
+        const legalMoves = calcAIMove(0)
+
+        console.log(legalMoves)
+
+        const desiredMove = model.PredictBestMove(legalMoves, true)
+        aiMovePiece(desiredMove![0] + 1, desiredMove![1] + 1)
+        
+        //Save state and reward from both sides to memory
+        const bitBoard = BoardToBitBoard()
+        const reversedBitBoard = ReverseBitBoard(bitBoard as [number])
+        
+        memory.addToMemory(bitBoard, CalculateReward(bitBoard))
+        memory.addToMemory(reversedBitBoard, CalculateReward(reversedBitBoard))
+
         break;
 
       default:
@@ -135,7 +213,7 @@ function movePiece (destinationIndex: number) {
 }
 
 function aiMovePiece (currentIndex: number, destinationIndex: number) {
-  
+  console.log("moving")
   store.dispatch(selectPiece(currentIndex))
   store.dispatch(moveUnit(destinationIndex))
   store.dispatch(setDestination(null))
